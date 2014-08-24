@@ -236,8 +236,8 @@
         'src/set-remote-description-observer.cc',
         'src/peerconnection.cc',
         'src/datachannel.cc',
-#        'src/mediastream.cc',
-#        'src/mediastreamtrack.cc',
+        'src/mediastream.cc',
+        'src/mediastreamtrack.cc'
       ]
     },
     {
