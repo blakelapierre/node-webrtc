@@ -80,7 +80,6 @@ io.on('connection', function (socket) {
             else if (pc.iceConnectionState === 'closed') {
                 pc = null;
             }
-            console.log('ICE:', pc.iceConnectionState);
         };
 
         /*if (isHost) {
