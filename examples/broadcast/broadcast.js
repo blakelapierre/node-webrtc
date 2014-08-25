@@ -62,6 +62,8 @@ io.on('connection', function (socket) {
                 });
                 logMessage('broadcast stream added successfully');
             };
+
+            socket.emit('isSource', JSON.stringify({isSource: true}));
         }
         else {
             listeners.push(pc);
@@ -70,7 +72,8 @@ io.on('connection', function (socket) {
             streams.forEach(function(stream) {
                 pc.addStream(stream);
             });
-            console.log('streams', streams);
+
+            socket.emit('isSource', JSON.stringify({isSource: false}));
         }
 
         pc.onicecandidate = function (evt) {
@@ -97,9 +100,6 @@ io.on('connection', function (socket) {
 
     socket.on('message',function(data) {
         logMessage('message received');
-        if (!pc) {
-            start();
-        }
 
         var message = JSON.parse(data);
         if (message.sdp) {
@@ -117,6 +117,8 @@ io.on('connection', function (socket) {
             pc.addIceCandidate(new webrtc.RTCIceCandidate(message.candidate));
         }
     });
+
+    start();
 });
 
 server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){

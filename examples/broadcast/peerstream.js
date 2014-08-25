@@ -13,13 +13,24 @@ else {
     var socket = io.connect();
 
     socket.on('connected', function(){
-        navigator.getMedia({video:true,audio:true}, function (source) {
-            console.log('local stream created');
-            media = source;
-            var sourceEl = document.getElementById('source');
-            sourceEl.src = window.URL.createObjectURL(media);
+
+    });
+
+    socket.on('isSource', function(data) {
+        isSource = JSON.parse(data).isSource;
+        console.log('isSource', isSource, JSON.parse(data));
+        if (isSource) {
+            navigator.getMedia({video:true,audio:true}, function (source) {
+                console.log('local stream created');
+                media = source;
+                var sourceEl = document.getElementById('source');
+                sourceEl.src = window.URL.createObjectURL(media);
+                start();
+            }, logError);
+        }
+        else {
             start();
-        }, logError);
+        }
     });
 
     socket.on('logmessage',function(message){
@@ -28,9 +39,6 @@ else {
 
     socket.on('message',function(data){
         logMessage('message received');
-        if (!pc) {
-            start();
-        }
 
         var message = JSON.parse(data);
         if (message.sdp) {
@@ -45,7 +53,7 @@ else {
         }
     });
 
-    var isHost = true;
+    var isSource = true;
     var media  = null;
 
     var pc = null;
@@ -77,7 +85,7 @@ else {
         };
 
         pc.onnegotiationneeded = function () {
-            pc.createOffer(localDescCreated, logError);
+            pc.createOffer(localDescCreated, logError, {mandatory: {OfferToReceiveAudio: true, OfferToReceiveVideo: true}});
         };
 
         pc.onaddstream = function (evt) {
@@ -86,9 +94,12 @@ else {
             rebroadcast.src = window.URL.createObjectURL(evt.stream);
         };
 
-        if (isHost) {
+        if (isSource) {
             console.log('local stream added to rtc connection for broadcast');
             pc.addStream(media);
+        }
+        else {
+            pc.onnegotiationneeded();
         }
     };
 }
