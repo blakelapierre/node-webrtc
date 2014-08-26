@@ -22,7 +22,7 @@ MediaStreamTrack::MediaStreamTrack(webrtc::MediaStreamTrackInterface* msti)
   _muted = false;
   _live = _internalMediaStreamTrack->state() == webrtc::MediaStreamTrackInterface::kLive;
   uv_mutex_init(&lock);
-  uv_async_init(uv_default_loop(), &async, Run);
+  uv_async_init(uv_default_loop(), &async, reinterpret_cast<uv_async_cb>(Run));
 
   async.data = this;
 }
@@ -136,7 +136,6 @@ void MediaStreamTrack::Run(uv_async_t* handle, int status)
     }
 
   }
-  scope.Close(Undefined());
   TRACE_END;
 }
 
@@ -156,7 +155,7 @@ NAN_METHOD(MediaStreamTrack::clone) {
   NanScope();
   // todo: implement
   TRACE_END;
-  NanReturnValue(Undefined());
+  NanReturnValue(NanUndefined());
 }
 
 NAN_METHOD(MediaStreamTrack::stop) {
@@ -164,7 +163,6 @@ NAN_METHOD(MediaStreamTrack::stop) {
   NanScope();
   // todo: implement
   TRACE_END;
-  NanReturnValue(Undefined());
 }
 
 NAN_GETTER(MediaStreamTrack::GetId) {
@@ -208,28 +206,28 @@ NAN_GETTER(MediaStreamTrack::GetEnabled) {
   bool enabled = self->_internalMediaStreamTrack->enabled();
 
   TRACE_END;
-  NanReturnValue(Boolean::New(enabled));
+  NanReturnValue(NanNew(enabled));
 }
 
 NAN_GETTER(MediaStreamTrack::GetMuted) {
   TRACE_CALL;
   NanScope();
   TRACE_END;
-  NanReturnValue(Boolean::New(false));
+  NanReturnValue(NanNew(false));
 }
 
 NAN_GETTER(MediaStreamTrack::GetReadOnly) {
   TRACE_CALL;
   NanScope();
   TRACE_END;
-  NanReturnValue(Boolean::New(false));
+  NanReturnValue(NanNew(false));
 }
 
 NAN_GETTER(MediaStreamTrack::GetRemote) {
   TRACE_CALL;
   NanScope();
   TRACE_END;
-  NanReturnValue(Boolean::New(false));
+  NanReturnValue(NanNew(false));
 }
 
 NAN_GETTER(MediaStreamTrack::GetReadyState) {
@@ -241,7 +239,7 @@ NAN_GETTER(MediaStreamTrack::GetReadyState) {
   webrtc::MediaStreamTrackInterface::TrackState state = self->_internalMediaStreamTrack->state();
 
   TRACE_END;
-  NanReturnValue(Number::New(static_cast<uint32_t>(state)));
+  NanReturnValue(NanNew(static_cast<uint32_t>(state)));
 }
 
 NAN_SETTER(MediaStreamTrack::SetEnabled) {

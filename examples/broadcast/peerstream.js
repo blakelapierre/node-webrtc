@@ -2,12 +2,12 @@ var RTCPeerConnection     = wrtc.RTCPeerConnection;
 var RTCSessionDescription = wrtc.RTCSessionDescription;
 var RTCIceCandidate       = wrtc.RTCIceCandidate;
 
-navigator.getMedia = ( navigator.getUserMedia ||
+var getUserMedia = ( navigator.getUserMedia ||
                        navigator.webkitGetUserMedia ||
                        navigator.mozGetUserMedia ||
                        navigator.msGetUserMedia);
 
-if (!navigator.getMedia)
+if (!getUserMedia)
     console.log('Error: getUserMedia is not supported on this browser');
 else {
     var socket = io.connect();
@@ -20,7 +20,7 @@ else {
         isSource = JSON.parse(data).isSource;
         console.log('isSource', isSource, JSON.parse(data));
         if (isSource) {
-            navigator.getMedia({video:true,audio:true}, function (source) {
+            getUserMedia.call(navigator, {video:true,audio:true}, function (source) {
                 console.log('local stream created');
                 media = source;
                 var sourceEl = document.getElementById('source');
