@@ -84,6 +84,7 @@ private:
   bool _inactive;
 
   rtc::scoped_refptr<webrtc::MediaStreamInterface> _internalMediaStream;
+  webrtc::AudioTrackVector audioTracks;
 };
 
 #endif

@@ -21,6 +21,8 @@ MediaStream::MediaStream(webrtc::MediaStreamInterface* msi)
 {
   _internalMediaStream->AddRef();
   _inactive = !IsMediaStreamActive();
+  audioTracks = _internalMediaStream->GetAudioTracks();
+
   uv_mutex_init(&lock);
   uv_async_init(uv_default_loop(), &async, reinterpret_cast<uv_async_cb>(Run));
 
@@ -185,12 +187,12 @@ NAN_METHOD(MediaStream::getAudioTracks) {
   NanScope();
 
   MediaStream* self = ObjectWrap::Unwrap<MediaStream>( args.Holder() );
-  webrtc::AudioTrackVector audioTracks = self->_internalMediaStream->GetAudioTracks();
+  webrtc::AudioTrackVector audioTracks = self->audioTracks;
 
   v8::Local<v8::Array> array = NanNew<Array>(audioTracks.size());
   int index = 0;
   for (webrtc::AudioTrackVector::iterator track = audioTracks.begin(); track != audioTracks.end(); track++, index++) {
-    v8::Local<v8::Value> cargv[1];
+    v8::Handle<v8::Value> cargv[1];
     cargv[0] = NanNew<External>(static_cast<void*>(track->get()));
     array->Set(index, NanNew(MediaStreamTrack::constructor)->NewInstance(1, cargv));
   }
@@ -209,7 +211,7 @@ NAN_METHOD(MediaStream::getVideoTracks) {
   v8::Local<v8::Array> array = NanNew<Array>(videoTracks.size());
   int index = 0;
   for (webrtc::VideoTrackVector::iterator track = videoTracks.begin(); track != videoTracks.end(); track++, index++) {
-    v8::Local<v8::Value> cargv[1];
+    v8::Handle<v8::Value> cargv[1];
     cargv[0] = NanNew<External>(static_cast<void*>(track->get()));
     array->Set(NanNew(index), NanNew(MediaStreamTrack::constructor)->NewInstance(1, cargv));
   }
@@ -315,7 +317,7 @@ void MediaStream::Init( Handle<Object> exports ) {
   tpl->SetClassName( NanNew( "MediaStream" ) );
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
   tpl->PrototypeTemplate()->Set( NanNew( "getAudioTracks" ),
-    NanNew<FunctionTemplate>( getAudioTracks )->GetFunction() );
+    NanNew<FunctionTemplate>( getAudioTracks ) );
   tpl->PrototypeTemplate()->Set( NanNew( "getVideoTracks" ),
     NanNew<FunctionTemplate>( getVideoTracks )->GetFunction() );
   tpl->PrototypeTemplate()->Set( NanNew( "getTrackById" ),
