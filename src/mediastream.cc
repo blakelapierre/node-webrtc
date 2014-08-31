@@ -226,10 +226,10 @@ NAN_METHOD(MediaStream::getTrackById) {
   v8::String::Utf8Value param1(args[0]->ToString());
   std::string _id = std::string(*param1);
 
-  talk_base::scoped_refptr<webrtc::MediaStreamTrackInterface> audioTrack = self->_internalMediaStream->FindAudioTrack(_id);
-  talk_base::scoped_refptr<webrtc::MediaStreamTrackInterface> videoTrack = self->_internalMediaStream->FindVideoTrack(_id);
+  rtc::scoped_refptr<webrtc::MediaStreamTrackInterface> audioTrack = self->_internalMediaStream->FindAudioTrack(_id);
+  rtc::scoped_refptr<webrtc::MediaStreamTrackInterface> videoTrack = self->_internalMediaStream->FindVideoTrack(_id);
 
-  talk_base::scoped_refptr<webrtc::MediaStreamTrackInterface> track = audioTrack.get() ? audioTrack : videoTrack;
+  rtc::scoped_refptr<webrtc::MediaStreamTrackInterface> track = audioTrack.get() ? audioTrack : videoTrack;
   webrtc::MediaStreamTrackInterface* msti = track.get();
   msti->AddRef();
 

@@ -11,8 +11,8 @@
 
 #include "talk/app/webrtc/jsep.h"
 #include "talk/app/webrtc/mediastreaminterface.h"
-#include "talk/base/thread.h"
-#include "talk/base/scoped_ptr.h"
+#include "webrtc/base/thread.h"
+#include "webrtc/base/scoped_ptr.h"
 #include "webrtc/system_wrappers/interface/ref_count.h"
 
 #include "common.h"
@@ -25,7 +25,7 @@ class MediaStream
 : public ObjectWrap,
   public webrtc::ObserverInterface
 {
-    
+
 public:
 
   enum AsyncEventType {
@@ -35,20 +35,20 @@ public:
     REMOVETRACK = 0x1 << 3, // 8
     CHANGE = 0x1 << 4, // 16
   };
-  
+
   MediaStream(webrtc::MediaStreamInterface* MediaStream);
   ~MediaStream();
-  
+
   //
   // ObserverInterface implementation.
   //
-  
+
   void OnChanged();
-  
+
   //
   // Nodejs wrapping.
   //
-  
+
   static void Init( Handle<Object> exports );
   static Persistent<Function> constructor;
   static NAN_METHOD(New);
@@ -59,16 +59,16 @@ public:
   static NAN_METHOD(addTrack);
   static NAN_METHOD(removeTrack);
   static NAN_METHOD(clone);
-  
+
   static NAN_GETTER(GetId);
   static NAN_GETTER(IsInactive);
-  
+
   static NAN_SETTER(ReadOnly);
 
   void QueueEvent(MediaStream::AsyncEventType type, void* data);
   webrtc::MediaStreamInterface* GetInterface();
   bool IsMediaStreamActive();
-  
+
 private:
   static void Run(uv_async_t* handle, int status);
 
@@ -82,8 +82,8 @@ private:
   std::queue<AsyncEvent> _events;
 
   bool _inactive;
-  
-  talk_base::scoped_refptr<webrtc::MediaStreamInterface> _internalMediaStream;
+
+  rtc::scoped_refptr<webrtc::MediaStreamInterface> _internalMediaStream;
 };
 
 #endif

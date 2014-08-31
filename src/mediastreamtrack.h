@@ -10,8 +10,8 @@
 
 #include "talk/app/webrtc/jsep.h"
 #include "talk/app/webrtc/mediastreaminterface.h"
-#include "talk/base/thread.h"
-#include "talk/base/scoped_ptr.h"
+#include "webrtc/base/thread.h"
+#include "webrtc/base/scoped_ptr.h"
 #include "webrtc/system_wrappers/interface/ref_count.h"
 
 #include "common.h"
@@ -24,7 +24,7 @@ class MediaStreamTrack
 : public ObjectWrap,
   public webrtc::ObserverInterface
 {
-    
+
 public:
 
   enum AsyncEventType {
@@ -34,27 +34,27 @@ public:
     ENDED = 0x1 << 3, // 8
     CHANGE = 0x1 << 4, // 16
   };
-  
+
   MediaStreamTrack(webrtc::MediaStreamTrackInterface* MediaStreamTrack);
   ~MediaStreamTrack();
-  
+
   //
   // ObserverInterface implementation.
   //
-  
+
   void OnChanged();
-  
+
   //
   // Nodejs wrapping.
   //
-  
+
   static void Init( Handle<Object> exports );
   static Persistent<Function> constructor;
   static NAN_METHOD(New);
 
   static NAN_METHOD(stop);
   static NAN_METHOD(clone);
-  
+
   static NAN_GETTER(GetId);
   static NAN_GETTER(GetKind);
   static NAN_GETTER(GetLabel);
@@ -63,13 +63,13 @@ public:
   static NAN_GETTER(GetReadOnly);
   static NAN_GETTER(GetRemote);
   static NAN_GETTER(GetReadyState);
-  
+
   static NAN_SETTER(SetEnabled);
   static NAN_SETTER(ReadOnly);
 
   void QueueEvent(MediaStreamTrack::AsyncEventType type, void* data);
   webrtc::MediaStreamTrackInterface* GetInterface();
-  
+
 private:
   static void Run(uv_async_t* handle, int status);
 
@@ -81,11 +81,11 @@ private:
   uv_mutex_t lock;
   uv_async_t async;
   std::queue<AsyncEvent> _events;
-  
+
   bool _live;
   bool _muted;
-  
-  talk_base::scoped_refptr<webrtc::MediaStreamTrackInterface> _internalMediaStreamTrack;
+
+  rtc::scoped_refptr<webrtc::MediaStreamTrackInterface> _internalMediaStreamTrack;
 };
 
 #endif
